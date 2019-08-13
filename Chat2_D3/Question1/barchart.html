@@ -1,0 +1,110 @@
+<html>
+</body>
+<svg width="960" height="500"></svg>
+</body>
+<style>
+	.bar {
+	  fill: steelblue;
+	}
+
+	.bar:hover {
+	  fill: brown;
+	}
+
+        
+    .n {
+      opacity: .8;
+      font-size: 10px;
+      margin-left: 4px;
+      font-family: sans-serif;
+      color: white;
+      padding: 6px;
+      background-color: #3C3176;
+    }
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js'></script>
+<script>
+const tip = d3.tip().html(d=> d.number);
+var svg = d3.select("svg")
+svg.call(tip)
+margin = {
+	top: 20,
+	right: 20,
+	bottom: 30,
+	left: 50
+},
+width = +svg.attr("width") - margin.left - margin.right,
+height = +svg.attr("height") - margin.top - margin.bottom,
+g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+g.append("text")
+.attr("fill", "#000")
+.attr("y", 0)
+.attr("x", width)
+.attr("text-anchor", "end")
+.text("linechart");
+
+
+var x = d3.scaleBand()
+	.rangeRound([0, width])
+    .padding(0.5);
+    
+var x_count = d3.scaleBand()
+	.rangeRound([0, width])
+	.padding(0.5);
+
+var y = d3.scaleLinear()
+	.rangeRound([height, 0]);
+
+d3.json("director.json").then(function (data) {
+    x.domain(data.map(function(d) { return d.name; }));
+    x_count.domain([...Array(data.length).keys()]);
+	y.domain([0, d3.max(data, function (d) {
+				return Number(d.number);
+			})]);
+
+	g.append("g")
+	.attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .append("text")
+	.attr("fill", "#000")
+    .attr("y", 6)
+    .attr("x", 2 * height)
+	.attr("dy", "0.71em")
+	.attr("text-anchor", "end")
+	.text("direct name");
+
+	g.append("g")
+	.call(d3.axisLeft(y))
+	.append("text")
+	.attr("fill", "#000")
+	.attr("transform", "rotate(-90)")
+	.attr("y", 6)
+	.attr("dy", "0.71em")
+	.attr("text-anchor", "end")
+	.text("direct movie number");
+
+	g.selectAll(".bar")
+	.data(data)
+	.enter().append("rect")
+	.attr("class", "bar")
+	.attr("x", function (d, i) {
+        // console.log(i);
+		return x_count(i);
+	})
+	.attr("y", function (d) {
+        console.log(d.number)
+		return y(d.number);
+	})
+	.attr("width", x.bandwidth())
+	.attr("height", function (d) {
+		return height - y(d.number);
+    })
+    .on('mouseover', tip.show)
+    .on('mouseout', tip.hide)
+});
+
+</script>
+</html>
