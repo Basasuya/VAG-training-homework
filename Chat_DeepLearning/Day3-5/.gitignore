@@ -1,0 +1,9 @@
+*.swp
+*.pyc
+.env/*
+.ipynb_checkpoints
+.DS_Store
+__pycache__
+checkpoints
+dogs-vs-cats-redux-kernels-edition*
+result.csv
